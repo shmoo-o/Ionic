@@ -1,0 +1,49 @@
+package foo.starred.ionic.config.data.feature
+
+import foo.starred.ionic.config.ConfigManager
+import foo.starred.ionic.config.data.base.IConfigElementData
+import foo.starred.ionic.config.data.impl.*
+
+data class ConfigFeatureData(
+    val name: String,
+    val description: String,
+    val key: String,
+    val default: Any?
+) {
+    val options = mutableListOf<IConfigElementData>()
+
+    fun option(data: IConfigElementData) {
+        options += data
+        when (data) {
+            is ConfigSwitchElementData -> default(data.key, data.default)
+            is ConfigSliderElementData -> default(data.key, data.default)
+            is ConfigSelectorElementData -> default(data.key, data.default)
+            is ConfigTextInputElementData -> default(data.key, data.default)
+            is ConfigColorPickerElementData -> default(data.key, data.default)
+            is ConfigKeybindElementData -> default(data.key, data.default)
+            is ConfigMultiSelectorElementData -> default(data.key, data.default)
+            is ConfigHudElementData -> {
+                default(data.key, data.default)
+                default("${data.key}.x", data.coordinate.x)
+                default("${data.key}.y", data.coordinate.y)
+                default("${data.key}.scale", data.coordinate.scale)
+            }
+            is ConfigGroupElementData -> default(data.key, !data.collapsed)
+            else -> {}
+        }
+    }
+
+    fun all(): List<String> {
+        return listOf(key) + options.flatMap {
+            when (it) {
+                is ConfigButtonElementData, is ConfigGroupElementData, is ConfigVariablesElementData, is ConfigInformationElementData -> emptyList()
+                is ConfigHudElementData -> listOf(it.key, "${it.key}.x", "${it.key}.y", "${it.key}.scale")
+                else -> listOf(it.key)
+            }
+        }
+    }
+
+    fun default(key: String, default: Any?) {
+        if (key !in ConfigManager.values && default != null) ConfigManager.values[key] = default
+    }
+}

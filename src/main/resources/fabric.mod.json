@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "A very awesome Hypixel SkyBlock QoL mod.",
+  "authors": [
+    "Starred"
+  ],
+  "contact": {},
+  "license": "BSD 3-Clause",
+  "icon": "assets/ionic/mod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      {
+        "value": "foo.starred.ionic.Ionic",
+        "adapter": "kotlin"
+      }
+    ]
+  },
+  "mixins": [
+    "${id}.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.19",
+    "fabric-api": "*",
+    "fabric-language-kotlin": "*",
+    "minecraft": "${minecraft}"
+  },
+  "accessWidener": "${tweaker}"
+}

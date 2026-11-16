@@ -1,0 +1,16 @@
+package foo.starred.ionic.config.data.impl
+
+import com.mojang.blaze3d.platform.InputConstants
+import foo.starred.ionic.config.data.base.IConfigElementData
+
+data class ConfigKeybindElementData(
+    override val name: String,
+    override val key: String,
+    val default: InputConstants.Key,
+    override val parent: String? = null,
+    override val description: String? = null
+) : IConfigElementData {
+    override fun with(key: String, parent: String?, description: String?): ConfigKeybindElementData {
+        return copy(key = key, parent = parent, description = description)
+    }
+}
