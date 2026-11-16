@@ -5,8 +5,10 @@ import foo.starred.ionic.event.core.on
 import foo.starred.ionic.event.impl.MessageEvent
 import foo.starred.ionic.event.impl.PacketEvent
 import foo.starred.ionic.event.impl.ScoreboardEvent
+import foo.starred.ionic.event.impl.WorldRenderEvent
 import foo.starred.kontext.abstraction.client.extension.mainThread
 import foo.starred.kontext.core.event.impl.KontextEvents
+import foo.starred.parallax.api.events.ParallaxEvents
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
 
 @LoadableIonicModule
@@ -22,6 +24,10 @@ object GenericEventDispatcher {
 
         KontextEvents.Scoreboard.UPDATE.register { event ->
             ScoreboardEvent.Update(event.lines0, event.lines1, event.components0, event.components1).post()
+        }
+
+        ParallaxEvents.EXTRACT.register {
+            WorldRenderEvent.Extract.post()
         }
     }
 }
