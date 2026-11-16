@@ -6,12 +6,15 @@ import foo.starred.ionic.config.dsl.impl.category.ConfigCategory
 import foo.starred.ionic.config.theme.impl.catppuccin.MochaColorScheme
 import foo.starred.ionic.event.impl.LocationEvent
 import foo.starred.ionic.event.impl.SlayerEvent
+import foo.starred.ionic.event.impl.TickEvent
 import foo.starred.ionic.event.impl.WorldRenderEvent
 import foo.starred.ionic.module.base.Module
 import foo.starred.kontext.api.entity.extension.renderAABB
 import foo.starred.kontext.api.entity.extension.renderVec3
 import foo.starred.parallax.api.primitives.ParallaxBox
 import foo.starred.parallax.api.primitives.ParallaxLine
+import net.minecraft.world.entity.Entity
+import java.util.concurrent.ConcurrentHashMap
 
 @LoadableIonicModule
 @IonicModuleScope(skyblock = true)
@@ -25,29 +28,36 @@ object MinibossESP : Module(
     private val color by config.colorPicker("Highlight color", MochaColorScheme.Text.argb)
     private val width by config.slider("Highlight width", 2f, 1f, 10f)
 
-    private val set: MutableSet<Int> = mutableSetOf()
+    private val entities = ConcurrentHashMap.newKeySet<Entity>()
 
     init {
         on<SlayerEvent.Miniboss.Spawn> {
-            set += slayerInfo.entity.id
+            entities += slayerInfo.entity
         }
 
         on<SlayerEvent.Miniboss.Death> {
-            set -= slayerInfo.entity.id
+            entities -= slayerInfo.entity
+        }
+
+        on<TickEvent.Client.End> {
+            if (ticks % 5 != 0) return@on
+
+            entities.removeIf { !it.isAlive }
         }
 
         on<LocationEvent.Server.Connect> {
-            set.clear()
+            entities.clear()
         }
 
-        on<WorldRenderEvent.Entity> {
-            val entity = entity ?: return@on
-            if (entity.id !in set) return@on
+        on<WorldRenderEvent.Extract> {
+            for (entity in entities) {
+                if (!entity.isAlive) continue
 
-            ParallaxBox.frame(entity.renderAABB(), color, width, depth)
+                ParallaxBox.frame(entity.renderAABB(), color, width, depth)
 
-            if (tracer) {
-                ParallaxLine.tracer(entity.renderVec3().toVector3f(), color, width)
+                if (tracer) {
+                    ParallaxLine.tracer(entity.renderVec3().toVector3f(), color, width)
+                }
             }
         }
     }
