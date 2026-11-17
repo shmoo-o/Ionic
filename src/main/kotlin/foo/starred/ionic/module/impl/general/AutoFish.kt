@@ -161,7 +161,7 @@ object AutoFish : Module(
     // ---------------------------------------------------------------------------------------
 
     private fun registerCommands() {
-        ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
+        ClientCommandRegistrationCallback.EVENT.register(ClientCommandRegistrationCallback { dispatcher, _ ->
             val node: LiteralArgumentBuilder<FabricClientCommandSource> = ClientCommandManager.literal("ionic")
             node.then(
                 ClientCommandManager.literal("hypetest").executes {
@@ -170,7 +170,7 @@ object AutoFish : Module(
                 }
             )
             dispatcher.register(node)
-        }
+        })
     }
 
     /**
@@ -359,4 +359,39 @@ object AutoFish : Module(
     /** Smallest rotation step a real mouse can produce at the current sensitivity. */
     private fun gcd(): Float {
         val f = client.options.sensitivity().get() * 0.6 + 0.2
-        return (f * f * f * 8.0 * 0.1
+        return (f * f * f * 8.0 * 0.15).toFloat()
+    }
+
+    private fun snap(from: Float, to: Float, gcd: Float): Float = from + round((to - from) / gcd) * gcd
+
+    private fun ease(t: Float): Float {
+        if (t < 0.5f) return 4f * t * t * t
+        val u = -2f * t + 2f
+        return 1f - u * u * u / 2f
+    }
+
+    private fun randomOffset(range: Float): Float = (Random.nextFloat() * 2f - 1f) * range
+
+    private fun actionDelay(): Int =
+        (`kill$delay` + if (`kill$variance` > 0) (0..`kill$variance`).random() else 0).coerceAtLeast(1)
+
+    private fun selectSlot(slot: Int) {
+        val player = client.player ?: return
+        if (player.inventory.selectedSlot == slot) return
+        player.inventory.selectedSlot = slot
+    }
+
+    private fun findHotbarSlot(item: Item): Int? {
+        val player = client.player ?: return null
+        return (0..8).firstOrNull { player.inventory.getItem(it).item == item }
+    }
+
+    /** Sends a command without the leading slash. */
+    private fun sendCommand(command: String) {
+        client.player?.connection?.sendCommand(command)
+    }
+
+    private fun say(message: String) {
+        client.player?.sendSystemMessage(Component.literal("[Auto fish] $message"))
+    }
+}
