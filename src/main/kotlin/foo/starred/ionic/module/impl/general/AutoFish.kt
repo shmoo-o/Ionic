@@ -159,7 +159,7 @@ object AutoFish : Module(
     // ---------------------------------------------------------------------------------------
 
     private fun registerCommands() {
-        ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
+        ClientCommandRegistrationCallback.EVENT.register(ClientCommandRegistrationCallback { dispatcher, _ ->
             dispatcher.register(
                 ClientCommandManager.literal("ionic").then(
                     ClientCommandManager.literal("hypetest").executes {
@@ -168,7 +168,7 @@ object AutoFish : Module(
                     }
                 )
             )
-        }
+        })
     }
 
     /**
@@ -390,6 +390,6 @@ object AutoFish : Module(
     }
 
     private fun say(message: String) {
-        client.player?.displayClientMessage(Component.literal("[Auto fish] $message"), false)
+        client.player?.sendSystemMessage(Component.literal("[Auto fish] $message"))
     }
 }
