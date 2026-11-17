@@ -159,16 +159,16 @@ object AutoFish : Module(
     // ---------------------------------------------------------------------------------------
 
     private fun registerCommands() {
-        ClientCommandRegistrationCallback.EVENT.register(ClientCommandRegistrationCallback { dispatcher, _ ->
-            dispatcher.register(
-                ClientCommandManager.literal("ionic").then(
-                    ClientCommandManager.literal("hypetest").executes {
-                        runHypeTest()
-                        Command.SINGLE_SUCCESS
-                    }
-                )
+        ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
+            val command = ClientCommandManager.literal("ionic")
+            command.then(
+                ClientCommandManager.literal("hypetest").executes {
+                    runHypeTest()
+                    Command.SINGLE_SUCCESS
+                }
             )
-        })
+            dispatcher.register(command)
+        }
     }
 
     /**
