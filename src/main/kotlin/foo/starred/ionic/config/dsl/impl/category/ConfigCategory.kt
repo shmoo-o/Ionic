@@ -4,7 +4,6 @@ enum class ConfigCategory(val displayName: String) {
     INFO("Information"),
     GENERAL("General"),
     RENDER("Render"),
-    SLAYER("Slayer"),
-    DUNGEON("Dungeon")
+    SLAYER("Slayer")
     ;
 }
